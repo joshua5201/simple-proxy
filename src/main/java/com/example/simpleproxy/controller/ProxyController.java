@@ -50,9 +50,7 @@ public class ProxyController {
         } catch (RestClientResponseException ex) {
             log.info("Exception during request", ex);
             HttpStatusCode errorStatus = ex.getStatusCode();
-            if (errorStatus.is4xxClientError()) {
-                return ResponseEntity.status(errorStatus).body(ex.getResponseBodyAsString());
-            }
+            return ResponseEntity.status(errorStatus).body(ex.getResponseBodyAsString());
         } catch (RestClientException ex) {
             log.info("Exception during request", ex);
         }
