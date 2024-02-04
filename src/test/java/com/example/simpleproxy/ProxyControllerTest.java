@@ -1,6 +1,7 @@
 package com.example.simpleproxy;
 
 import com.example.simpleproxy.model.Upstream;
+import com.example.simpleproxy.service.HealthCheckService;
 import com.example.simpleproxy.service.UpstreamService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -34,6 +35,8 @@ public class ProxyControllerTest {
 
     @MockBean
     private UpstreamService upstreamService;
+    @MockBean
+    private HealthCheckService healthCheckService;
 
     @Captor
     private ArgumentCaptor<URI> uriArgumentCaptor;
@@ -49,7 +52,7 @@ public class ProxyControllerTest {
 
     @Test
     void givenJsonRequest_SendSameRequestToUpstream_Return200Response() {
-        Upstream upstream = new Upstream("http", "localhost", 8081);
+        Upstream upstream = new Upstream("http", "localhost", 8081, "");
         when(upstreamService.getNext()).thenReturn(upstream);
         final String rawJson = "{\"key\": \"val\"}";
         when(requestTestTemplate.postForEntity(any(URI.class), any(HttpEntity.class), eq((String.class)))).thenReturn(ResponseEntity.ok().body(rawJson));
@@ -74,7 +77,7 @@ public class ProxyControllerTest {
 
     @Test
     void givenJsonRequest_SendSameRequestToUpstream_ReturnErrorResponseFromUpstream() {
-        Upstream upstream = new Upstream("http", "localhost", 8081);
+        Upstream upstream = new Upstream("http", "localhost", 8081, "");
         when(upstreamService.getNext()).thenReturn(upstream);
         final String rawJson = "{\"key\": \"val\"}";
         when(requestTestTemplate.postForEntity(any(URI.class), any(HttpEntity.class), eq((String.class)))).thenReturn(ResponseEntity.badRequest().body(rawJson));

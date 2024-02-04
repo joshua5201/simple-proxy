@@ -4,12 +4,16 @@ simple-proxy:
     - protocol: http
       host: localhost
       port: 8081
+      health: /actuator/health
     - protocol: http
       host: localhost
       port: 8082
+      health: /actuator/health
     - protocol: http
       host: localhost
       port: 8083
+      health: /actuator/health
     - protocol: http
       host: localhost
       port: 8888
+      health: /actuator/health

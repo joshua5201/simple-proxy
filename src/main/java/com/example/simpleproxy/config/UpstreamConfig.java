@@ -19,4 +19,6 @@ public class UpstreamConfig {
     private List<Upstream> upstreams = new ArrayList<>();
     private int backendConnectTimeout = 1000;
     private int backendReadTimeout = 1000;
+    private int healthCheckSuccessCount = 5;
+    private int healthCheckFailureCount = 3;
 }

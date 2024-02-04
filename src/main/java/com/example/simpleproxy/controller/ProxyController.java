@@ -1,5 +1,7 @@
 package com.example.simpleproxy.controller;
 
+import com.example.simpleproxy.error.NoAvailableHealthyUpstreamException;
+import com.example.simpleproxy.model.Upstream;
 import com.example.simpleproxy.service.UpstreamService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +31,16 @@ public class ProxyController {
 
     @PostMapping(value = "/**", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> proxy(HttpEntity<String> request, HttpServletRequest httpServletRequest) {
-        var upstream = upstreamService.getNext();
+        Upstream upstream;
+        try {
+           upstream = upstreamService.getNext();
+        } catch (NoAvailableHealthyUpstreamException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
+        }
+
         URI uri;
         try {
-            uri = new URI(upstream.getProtocol(), null, upstream.getHost(), upstream.getPort(),
-                    httpServletRequest.getRequestURI(), httpServletRequest.getQueryString(), null);
+            uri = upstream.getUri(httpServletRequest.getRequestURI(), httpServletRequest.getQueryString());
         } catch (URISyntaxException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

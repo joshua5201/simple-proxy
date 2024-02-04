@@ -2,7 +2,9 @@ package com.example.simpleproxy;
 
 import com.example.simpleproxy.config.UpstreamConfig;
 import com.example.simpleproxy.model.Upstream;
+import com.example.simpleproxy.service.HealthCheckService;
 import com.example.simpleproxy.service.RoundRobinUpstreamService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,14 +21,21 @@ import static org.mockito.Mockito.*;
 public class RoundRobinUpstreamServiceTest {
     @Mock
     private UpstreamConfig upstreamConfig;
+    @Mock
+    private HealthCheckService healthCheckService;
     @InjectMocks
     private RoundRobinUpstreamService target;
 
+    @BeforeEach
+    void mockHealthCheck() {
+        when(healthCheckService.isHealthy(anyInt())).thenReturn(true);
+    }
+
     @Test
     void whenGetNextCalled_UpstreamReturnedInRoundRobin() {
-        List<Upstream> upstreams = List.of(new Upstream("http", "127.0.0.1", 8080),
-                new Upstream("https", "www.google.com", 1234),
-            new Upstream("https", "www.google.com", 5566));
+        List<Upstream> upstreams = List.of(new Upstream("http", "127.0.0.1", 8080, ""),
+                new Upstream("https", "www.google.com", 1234, ""),
+            new Upstream("https", "www.google.com", 5566, ""));
         when(upstreamConfig.getUpstreams()).thenReturn(upstreams);
         List<Upstream> upstreamsGot = new ArrayList<>();
         upstreamsGot.add(target.getNext());
@@ -46,9 +55,9 @@ public class RoundRobinUpstreamServiceTest {
 
     @Test
     void whenGetNextCalled_UpstreamReturnedInRoundRobinBetweenThreads() throws InterruptedException {
-        List<Upstream> upstreams = List.of(new Upstream("http", "host1", 8080),
-                new Upstream("http", "host2", 1234),
-                new Upstream("http", "host3", 5566));
+        List<Upstream> upstreams = List.of(new Upstream("http", "host1", 8080, ""),
+                new Upstream("http", "host2", 1234, ""),
+                new Upstream("http", "host3", 5566, ""));
         when(upstreamConfig.getUpstreams()).thenReturn(upstreams);
         List<Upstream> upstreamsGot = new ArrayList<>();
         upstreamsGot.add(target.getNext());
