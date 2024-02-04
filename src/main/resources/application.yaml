@@ -1,0 +1,15 @@
+server.tomcat.threads.min-spare: 2
+simple-proxy:
+  upstreams:
+    - protocol: http
+      host: localhost
+      port: 8081
+    - protocol: http
+      host: localhost
+      port: 8082
+    - protocol: http
+      host: localhost
+      port: 8083
+    - protocol: http
+      host: localhost
+      port: 8888
